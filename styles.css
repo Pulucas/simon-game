@@ -20,6 +20,7 @@ button {
   border-radius: 20px;
   width: calc(50vw - 20px);
   height: calc(50vh - 20px);
+	background-color: hsl(var(--hue), var(--sat), var(--light));
 }
 
 .row {
@@ -27,35 +28,32 @@ button {
 }
 
 .orange {
-  background: hsl(39, 100%, 48%);
-}
-
-.orange.highlight {
-  background: hsl(42, 100%, 60%);
+  --hue: 40;
+  --sat: 60%;
+  --light: 50%;
 }
 
 .blue {
-  background: hsl(240, 100%, 45%);
-}
-
-.blue.highlight {
-  background: hsl(240, 100%, 62%);
+  --hue: 240;
+  --sat: 60%;
+  --light: 50%;
 }
 
 .red {
-  background: hsl(0, 100%, 35%);
-}
-
-.red.highlight {
-  background: hsl(0, 100%, 50%);
+  --hue: 0;
+  --sat: 60%;
+  --light: 50%;
 }
 
 .green {
-  background: hsl(120, 100%, 23%);
+  --hue: 120;
+  --sat: 60%;
+  --light: 50%;
 }
 
-.green.highlight {
-  background: hsl(120, 100%, 35%);
+.highlight {
+  --sat: 100%;
+  --light: 35%;
 }
 
 .logo {
