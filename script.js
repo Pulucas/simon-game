@@ -10,6 +10,7 @@ const gameState = {
 }
 
 async function main() {
+  // add to sequence
   gameState.sequence.push(1);
   gameState.sequence.push(2);
   gameState.sequence.push(3);
@@ -24,12 +25,14 @@ function removeListener(e) { e.target.classList.remove("highlight") };
 function toggleTapping() {
   for (let i = 1; i <= 4; i++) { // goes through all squares
     if (square[i].eventListener === false) { // if there's no event listener for a given square
+      // adds a highlight to the square when clicked
       square[i].element.addEventListener("touchstart", addListener);
       square[i].element.addEventListener("touchend", removeListener);
       square[i].element.addEventListener("mousedown", addListener);
       square[i].element.addEventListener("mouseup", removeListener);
       square[i].eventListener = true;
     } else {
+      // removes event listener
       square[i].element.removeEventListener("touchstart", addListener);
       square[i].element.removeEventListener("touchend", removeListener);
       square[i].element.removeEventListener("mousedown", addListener);
