@@ -27,35 +27,35 @@ button {
 }
 
 .orange {
-  background: #FFA500;
+  background: hsl(39, 100%, 50%);
 }
 
 .orange.highlight {
-  background: #FFE000;
+  background: hsl(39, 100%, 62%);
 }
 
 .blue {
-  background: #0000E0;
+  background: hsl(240, 100%, 44%);
 }
 
 .blue.highlight {
-  background: #6060FF;
+  background: hsl(240, 100%, 56%);
 }
 
 .red {
-  background: #E00000;
+  background: hsl(0, 100%, 44%);
 }
 
 .red.highlight {
-  background: #FF5500;
+  background: hsl(0, 100%, 60%);
 }
 
 .green {
-  background: #007700;
+  background: hsl(120, 100%, 23%);
 }
 
 .green.highlight {
-  background: #20B000;
+  background: hsl(120, 100%, 35%);
 }
 
 .logo {
