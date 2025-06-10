@@ -27,27 +27,27 @@ button {
 }
 
 .orange {
-  background: hsl(39, 100%, 50%);
+  background: hsl(39, 100%, 48%);
 }
 
 .orange.highlight {
-  background: hsl(39, 100%, 62%);
+  background: hsl(42, 100%, 60%);
 }
 
 .blue {
-  background: hsl(240, 100%, 44%);
+  background: hsl(240, 100%, 45%);
 }
 
 .blue.highlight {
-  background: hsl(240, 100%, 56%);
+  background: hsl(240, 100%, 62%);
 }
 
 .red {
-  background: hsl(0, 100%, 44%);
+  background: hsl(0, 100%, 35%);
 }
 
 .red.highlight {
-  background: hsl(0, 100%, 60%);
+  background: hsl(0, 100%, 50%);
 }
 
 .green {
