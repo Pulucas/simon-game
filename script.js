@@ -1,3 +1,5 @@
+const startButton = document.getElementById("start-button");
+const endScreenMessage = document.getElementById("end-screen-message")
 const square = {
   1: { element: document.getElementById("1") },
   2: { element: document.getElementById("2") },
@@ -12,7 +14,7 @@ const gameState = {
 }
 
 function startScreen() {
-  
+
 }
 
 async function main() {
