@@ -1,13 +1,14 @@
 const square = {
-  1: { element: document.getElementById("1"), eventListenerTappingAnimation: false, eventListenerRecordUserInput: false },
-  2: { element: document.getElementById("2"), eventListenerTappingAnimation: false, eventListenerRecordUserInput: false },
-  3: { element: document.getElementById("3"), eventListenerTappingAnimation: false, eventListenerRecordUserInput: false },
-  4: { element: document.getElementById("4"), eventListenerTappingAnimation: false, eventListenerRecordUserInput: false },
+  1: { element: document.getElementById("1") },
+  2: { element: document.getElementById("2") },
+  3: { element: document.getElementById("3") },
+  4: { element: document.getElementById("4") },
 }
 
 const gameState = {
   sequence: [],
   buttonPressCount: 0,
+  isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
 
 async function main() {
@@ -21,60 +22,72 @@ async function main() {
   await highlightSquares(gameState.sequence);
 
   // let the user tap the squares
-  // toggleTapping();
+  toggleTapping(true);
 
   // record the user's inputs
   // end game immediately if user gets one wrong button press
-  // toggleRecordUserInputs();
+  const roundWin = await waitForUserSequence();
+  console.log(roundWin);
 
-  // if user completed sequence completely, restart this function
+  // stop the user from tapping the squares
+  toggleTapping(false);
+
+  // reset all variables that need to be reset to make game playable for next round
+
+  // if user completed sequence completely, restart this function, else pull up some game over screen
+  // if the user has reached level 20, give confetti and pull up some winner screen
 };
 
-function addListenerRecordUserInput(e) {
+async function waitForUserSequence() {
+  const roundWin = await new Promise((res) => {
+    toggleRecordUserInputs(true, res);
+  });
+  toggleRecordUserInputs(false, null);
+  return roundWin;
+}
+
+function addListenerRecordUserInput(e, resolve) {
   if (e.target.id === gameState.sequence[gameState.buttonPressCount].toString()) {
     console.log("correct")
     gameState.buttonPressCount += 1
+    if (gameState.buttonPressCount === gameState.sequence.length) resolve(true); // finish round when we've gone through all sequences
   } else {
     console.log("game over")
-    gameState.buttonPressCount = 0;
-    toggleTapping();
-    toggleRecordUserInputs();
+    resolve(false);
   }
 }
-function toggleRecordUserInputs() {
+async function toggleRecordUserInputs(toggleOn, resolve) {
+  const eventType = gameState.isMobile ? "touchstart" : "mousedown";
   for (let i = 1; i <= 4; i++) { // goes through all squares
-    if (square[i].eventListenerRecordUserInput === false) {
-      square[i].element.addEventListener("touchstart", addListenerRecordUserInput);
-      square[i].element.addEventListener("mousedown", addListenerRecordUserInput);
-      square[i].eventListenerRecordUserInput = true;
+    if (toggleOn) {
+      square[i].recordHandler = function(e) {
+        addListenerRecordUserInput(e, resolve);
+      }
+      square[i].element.addEventListener(eventType, square[i].recordHandler);
       console.log("added listeners")
     } else {
-      square[i].element.removeEventListener("touchstart", addListenerRecordUserInput);
-      square[i].element.removeEventListener("mousedown", addListenerRecordUserInput);
-      square[i].eventListenerRecordUserInput = false;
+      
+      square[i].element.removeEventListener(eventType, square[i].recordHandler);
+      square[i].recordHandler = null;
       console.log("removed listeners")
     }
   }
 }
 
-function addListenerTappingAnimation(e) { e.target.classList.add("highlight"); };
-function removeListenerTappingAnimation(e) { e.target.classList.remove("highlight"); };
-function toggleTapping() {
+function highlightSquare(e) { e.target.classList.add("highlight"); };
+function unhighlightSquare(e) { e.target.classList.remove("highlight"); };
+function toggleTapping(toggleOn) {
+  const eventTypeHighligh = gameState.isMobile ? "touchstart" : "mousedown";
+  const eventTypeUnhighlight = gameState.isMobile ? "touchend" : "mouseup";
   for (let i = 1; i <= 4; i++) { // goes through all squares
-    if (square[i].eventListener === false) { // if there's no event listener for a given square
+    if (toggleOn) { // if there's no event listener for a given square
       // adds a highlight to the square when clicked
-      square[i].element.addEventListener("touchstart", addListenerTappingAnimation);
-      square[i].element.addEventListener("touchend", removeListenerTappingAnimation);
-      square[i].element.addEventListener("mousedown", addListenerTappingAnimation);
-      square[i].element.addEventListener("mouseup", removeListenerTappingAnimation);
-      square[i].eventListener = true;
+      square[i].element.addEventListener(eventTypeHighligh, highlightSquare);
+      square[i].element.addEventListener(eventTypeUnhighlight, unhighlightSquare);
     } else {
       // removes event listener
-      square[i].element.removeEventListener("touchstart", addListenerTappingAnimation);
-      square[i].element.removeEventListener("touchend", removeListenerTappingAnimation);
-      square[i].element.removeEventListener("mousedown", addListenerTappingAnimation);
-      square[i].element.removeEventListener("mouseup", removeListenerTappingAnimation);
-      square[i].eventListener = false;
+      square[i].element.removeEventListener(eventTypeHighligh, highlightSquare);
+      square[i].element.removeEventListener(eventTypeUnhighlight, unhighlightSquare);
     }
   }
 }
