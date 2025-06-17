@@ -33,10 +33,30 @@ async function main() {
   toggleTapping(false);
 
   // reset all variables that need to be reset to make game playable for next round
+  gameState.buttonPressCount = 0;
 
   // if user completed sequence completely, restart this function, else pull up some game over screen
   // if the user has reached level 20, give confetti and pull up some winner screen
+  if (!roundWin) {
+    showGameOverScreen();
+    return;
+  }
+
+  if (gameState.sequence.length === 20) {
+    showWinScreen();
+    return;
+  }
+
+  main();
 };
+
+function showWinScreen() {
+
+}
+
+function showGameOverScreen() {
+
+}
 
 async function waitForUserSequence() {
   const roundWin = await new Promise((res) => {
