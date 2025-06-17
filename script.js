@@ -11,12 +11,13 @@ const gameState = {
   isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
 
+function startScreen() {
+  
+}
+
 async function main() {
   // add 1 rng to sequence
-  gameState.sequence.push(1);
-  gameState.sequence.push(2);
-  gameState.sequence.push(3);
-  gameState.sequence.push(4);
+  gameState.sequence.push(RNG());
 
   // highlight the squares
   await highlightSquares(gameState.sequence);
@@ -29,7 +30,7 @@ async function main() {
   const roundWin = await waitForUserSequence();
   console.log(roundWin);
 
-  // stop the user from tapping the squares
+  // stop the user from tapping the squares (highlights)
   toggleTapping(false);
 
   // reset all variables that need to be reset to make game playable for next round
@@ -42,7 +43,7 @@ async function main() {
     return;
   }
 
-  if (gameState.sequence.length === 20) {
+  if (gameState.sequence.length === 10) {
     showWinScreen();
     return;
   }
@@ -51,11 +52,11 @@ async function main() {
 };
 
 function showWinScreen() {
-
+  console.log("Game Win");
 }
 
 function showGameOverScreen() {
-
+  console.log("Game Lose");
 }
 
 async function waitForUserSequence() {
@@ -68,28 +69,28 @@ async function waitForUserSequence() {
 
 function addListenerRecordUserInput(e, resolve) {
   if (e.target.id === gameState.sequence[gameState.buttonPressCount].toString()) {
-    console.log("correct")
-    gameState.buttonPressCount += 1
+    console.log("correct");
+    gameState.buttonPressCount += 1;
     if (gameState.buttonPressCount === gameState.sequence.length) resolve(true); // finish round when we've gone through all sequences
   } else {
-    console.log("game over")
+    console.log("incorrect");
     resolve(false);
   }
 }
 async function toggleRecordUserInputs(toggleOn, resolve) {
-  const eventType = gameState.isMobile ? "touchstart" : "mousedown";
+  const eventType = gameState.isMobile ? "touchend" : "mouseup";
   for (let i = 1; i <= 4; i++) { // goes through all squares
     if (toggleOn) {
       square[i].recordHandler = function(e) {
         addListenerRecordUserInput(e, resolve);
       }
       square[i].element.addEventListener(eventType, square[i].recordHandler);
-      console.log("added listeners")
+      console.log("added click listeners");
     } else {
       
       square[i].element.removeEventListener(eventType, square[i].recordHandler);
       square[i].recordHandler = null;
-      console.log("removed listeners")
+      console.log("removed click listeners");
     }
   }
 }
@@ -97,17 +98,19 @@ async function toggleRecordUserInputs(toggleOn, resolve) {
 function highlightSquare(e) { e.target.classList.add("highlight"); };
 function unhighlightSquare(e) { e.target.classList.remove("highlight"); };
 function toggleTapping(toggleOn) {
-  const eventTypeHighligh = gameState.isMobile ? "touchstart" : "mousedown";
-  const eventTypeUnhighlight = gameState.isMobile ? "touchend" : "mouseup";
+  const eventTypeClick = gameState.isMobile ? "touchstart" : "mousedown";
+  const eventTypeUnclick = gameState.isMobile ? "touchend" : "mouseup";
   for (let i = 1; i <= 4; i++) { // goes through all squares
     if (toggleOn) { // if there's no event listener for a given square
       // adds a highlight to the square when clicked
-      square[i].element.addEventListener(eventTypeHighligh, highlightSquare);
-      square[i].element.addEventListener(eventTypeUnhighlight, unhighlightSquare);
+      square[i].element.addEventListener(eventTypeClick, highlightSquare);
+      square[i].element.addEventListener(eventTypeUnclick, unhighlightSquare);
+      console.log("added highligh listeners");
     } else {
       // removes event listener
-      square[i].element.removeEventListener(eventTypeHighligh, highlightSquare);
-      square[i].element.removeEventListener(eventTypeUnhighlight, unhighlightSquare);
+      square[i].element.removeEventListener(eventTypeClick, highlightSquare);
+      square[i].element.removeEventListener(eventTypeUnclick, unhighlightSquare);
+      console.log("removed highligh listeners");
     }
   }
 }
@@ -126,4 +129,4 @@ function RNG() {
   return Math.ceil(Math.random() * 4);
 }
 
-main();
+startScreen();
