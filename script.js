@@ -42,7 +42,7 @@ const square = {
 const gameState = {
   sequence: [],
   buttonPressCount: 0,
-  winLength: 1,
+  winLength: 20,
   isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
 
@@ -52,6 +52,8 @@ function startGame() {
 
   // wait until start button is pressed
   function waitForButtonPress(event) {
+    console.log("Starting Game");
+
     // hide start screen
     screen.start.close();
 
@@ -67,8 +69,7 @@ function startGame() {
 }
 
 async function main() {
-  console.log("Starting Game");
-
+  console.log(gameState);
   // add 1 rng to sequence
   gameState.sequence.push(RNG());
 
@@ -104,16 +105,51 @@ async function main() {
   main();
 };
 
+function resetGame() {
+  gameState.buttonPressCount = 0;
+  gameState.sequence = [];
+}
+
+function waitForButtonPress(event) {
+  // hide end screen
+  screen.end.close();
+
+  // show the start screen
+  startGame();
+
+  // remove event listener
+  console.log("removed event listener on end screen button");
+  event.target.removeEventListener('click', waitForButtonPress);
+}
+
 function showWinScreen() {
   console.log("Game Win");
+  
+  // display end screen
   screen.end.element.message.innerText = "You Won!";
   screen.end.open();
+
+  // reset all game variables
+  resetGame();
+
+  // button runs startGame function
+  console.log("added event listener on end screen button");
+  screen.end.element.button.addEventListener('click', waitForButtonPress);
 }
 
 function showGameOverScreen() {
   console.log("Game Lose");
+  
+  // display end screen
   screen.end.element.message.innerText = "You Lost!";
   screen.end.open();
+
+  // reset all game variables
+  resetGame();
+
+  // button runs startGame function
+  console.log("added event listener on end screen button");
+  screen.end.element.button.addEventListener('click', waitForButtonPress);
 }
 
 async function waitForUserSequence() {
