@@ -20,6 +20,7 @@ const screen = {
       background: document.getElementById("end-screen-background"),
       button: document.getElementById("end-screen-button"),
       message: document.getElementById("end-screen-message"),
+      messageDesc: document.getElementById("end-screen-message-desc"),
     },
     open: () => {
       screen.end.element.box.classList.add("show");
@@ -29,6 +30,16 @@ const screen = {
       screen.end.element.box.classList.remove("show");
       screen.end.element.background.classList.remove("show");
     },
+  },
+  logo: {
+    element: {
+      text: document.getElementById("logo-text"),
+    },
+    update: (roundNum) => {
+      const text = screen.logo.element.text.innerHTML.split("<br>");
+      text[text.length - 1] = roundNum.toString();
+      screen.logo.element.text.innerHTML = text.join("<br>");
+    }
   }
 }
 const endScreenMessage = document.getElementById("end-screen-message")
@@ -69,9 +80,11 @@ function startGame() {
 }
 
 async function main() {
-  console.log(gameState);
   // add 1 rng to sequence
   gameState.sequence.push(RNG());
+
+  // update level number
+  screen.logo.update(gameState.sequence.length);
 
   // highlight the squares
   await highlightSquares(gameState.sequence);
@@ -141,7 +154,8 @@ function showGameOverScreen() {
   console.log("Game Lose");
   
   // display end screen
-  screen.end.element.message.innerText = "You Lost!";
+  screen.end.element.message.innerText = "Game Over!";
+  screen.end.element.messageDesc.innerText = `You lasted ${gameState.sequence.length - 1} ${gameState.sequence.length - 1 === 1 ? "round" : "rounds"}.`;
   screen.end.open();
 
   // reset all game variables
