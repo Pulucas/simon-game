@@ -1,4 +1,36 @@
-const startButton = document.getElementById("start-button");
+const screen = {
+  start: {
+    element: {
+      box: document.getElementById("start-screen-box"),
+      background: document.getElementById("start-screen-background"),
+      button: document.getElementById("start-button"),
+    },
+    open: () => {
+      screen.start.element.box.classList.add("show");
+      screen.start.element.background.classList.add("show");
+    },
+    close: () => {
+      screen.start.element.box.classList.remove("show");
+      screen.start.element.background.classList.remove("show");
+    },
+  },
+  end: {
+    element: {
+      box: document.getElementById("end-screen-box"),
+      background: document.getElementById("end-screen-background"),
+      button: document.getElementById("end-screen-button"),
+      message: document.getElementById("end-screen-message"),
+    },
+    open: () => {
+      screen.end.element.box.classList.add("show");
+      screen.end.element.background.classList.add("show");
+    },
+    close: () => {
+      screen.end.element.box.classList.remove("show");
+      screen.end.element.background.classList.remove("show");
+    },
+  }
+}
 const endScreenMessage = document.getElementById("end-screen-message")
 const square = {
   1: { element: document.getElementById("1") },
@@ -10,14 +42,33 @@ const square = {
 const gameState = {
   sequence: [],
   buttonPressCount: 0,
+  winLength: 1,
   isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
 
-function startScreen() {
+function startGame() {
+  // present start screen
+  screen.start.open();
 
+  // wait until start button is pressed
+  function waitForButtonPress(event) {
+    // hide start screen
+    screen.start.close();
+
+    // play the game
+    main();
+
+    // remove event listener
+    console.log("removed event listener on start screen button");
+    screen.start.element.button.removeEventListener('click', waitForButtonPress);
+  }
+  console.log("added event listener on start screen button");
+  screen.start.element.button.addEventListener('click', waitForButtonPress);
 }
 
 async function main() {
+  console.log("Starting Game");
+
   // add 1 rng to sequence
   gameState.sequence.push(RNG());
 
@@ -30,7 +81,7 @@ async function main() {
   // record the user's inputs
   // end game immediately if user gets one wrong button press
   const roundWin = await waitForUserSequence();
-  console.log(roundWin);
+  console.log("Won round:", roundWin);
 
   // stop the user from tapping the squares (highlights)
   toggleTapping(false);
@@ -45,7 +96,7 @@ async function main() {
     return;
   }
 
-  if (gameState.sequence.length === 10) {
+  if (gameState.sequence.length === gameState.winLength) {
     showWinScreen();
     return;
   }
@@ -55,10 +106,14 @@ async function main() {
 
 function showWinScreen() {
   console.log("Game Win");
+  screen.end.element.message.innerText = "You Won!";
+  screen.end.open();
 }
 
 function showGameOverScreen() {
   console.log("Game Lose");
+  screen.end.element.message.innerText = "You Lost!";
+  screen.end.open();
 }
 
 async function waitForUserSequence() {
@@ -69,8 +124,8 @@ async function waitForUserSequence() {
   return roundWin;
 }
 
-function addListenerRecordUserInput(e, resolve) {
-  if (e.target.id === gameState.sequence[gameState.buttonPressCount].toString()) {
+function addListenerRecordUserInput(event, resolve) {
+  if (event.target.id === gameState.sequence[gameState.buttonPressCount].toString()) {
     console.log("correct");
     gameState.buttonPressCount += 1;
     if (gameState.buttonPressCount === gameState.sequence.length) resolve(true); // finish round when we've gone through all sequences
@@ -83,8 +138,8 @@ async function toggleRecordUserInputs(toggleOn, resolve) {
   const eventType = gameState.isMobile ? "touchend" : "mouseup";
   for (let i = 1; i <= 4; i++) { // goes through all squares
     if (toggleOn) {
-      square[i].recordHandler = function(e) {
-        addListenerRecordUserInput(e, resolve);
+      square[i].recordHandler = function(event) {
+        addListenerRecordUserInput(event, resolve);
       }
       square[i].element.addEventListener(eventType, square[i].recordHandler);
       console.log("added click listeners");
@@ -97,8 +152,8 @@ async function toggleRecordUserInputs(toggleOn, resolve) {
   }
 }
 
-function highlightSquare(e) { e.target.classList.add("highlight"); };
-function unhighlightSquare(e) { e.target.classList.remove("highlight"); };
+function highlightSquare(event) { event.target.classList.add("highlight"); };
+function unhighlightSquare(event) { event.target.classList.remove("highlight"); };
 function toggleTapping(toggleOn) {
   const eventTypeClick = gameState.isMobile ? "touchstart" : "mousedown";
   const eventTypeUnclick = gameState.isMobile ? "touchend" : "mouseup";
@@ -131,4 +186,4 @@ function RNG() {
   return Math.ceil(Math.random() * 4);
 }
 
-startScreen();
+startGame();
