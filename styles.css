@@ -113,6 +113,11 @@ button {
   font-size: larger;
 }
 
+.logo.mobile {
+  width: max(15vw, 15vh);
+  height: max(15vw, 15vh);
+}
+
 .logo-under {
   background: white;
   position: absolute;
@@ -122,4 +127,9 @@ button {
   width: max(16vw, 16vh);
   height: max(16vw, 16vh);
   border-radius: 100%;
+}
+
+.logo-under.mobile {
+  width: max(18vw, 18vh);
+  height: max(18vw, 18vh);
 }
