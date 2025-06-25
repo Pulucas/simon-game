@@ -24,9 +24,10 @@ const screen = {
     element: {
       box: document.getElementById("end-screen-box"),
       background: document.getElementById("end-screen-background"),
-      button: document.getElementById("end-screen-button"),
       message: document.getElementById("end-screen-message"),
       messageDesc: document.getElementById("end-screen-message-desc"),
+      messageHighscore: document.getElementById("end-screen-message-highscore"),
+      button: document.getElementById("end-screen-button"),
     },
     open: () => {
       screen.end.element.box.classList.add("show");
@@ -90,16 +91,24 @@ const gameState = {
   lengthBetweenHighlights: 300,
   sequence: [],
   buttonPressCount: 0,
-  winLength: 20,
+  winLength: 5,
+  highscore: 0, // may change in loadGame()
   isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
 
-if (gameState.isMobile) {
-  const logo = document.getElementsByClassName("logo");
-  const logoUnder = document.getElementsByClassName("logo-under");
+function loadGame() {
+  // change size of logo
+  if (gameState.isMobile) {
+    const logo = document.getElementsByClassName("logo");
+    const logoUnder = document.getElementsByClassName("logo-under");
 
-  logo[0].classList.add("mobile");
-  logoUnder[0].classList.add("mobile");
+    logo[0].classList.add("mobile");
+    logoUnder[0].classList.add("mobile");
+  }
+
+  // get previous highscore from localStorage
+  const localHighscore = localStorage.getItem("highscore");
+  if (localHighscore !== null) gameState.highscore = parseInt(localHighscore);
 }
 
 function startGame() {
@@ -144,24 +153,35 @@ async function main() {
 
   // stop the user from tapping the squares (highlights)
   toggleTapping(false);
-
+  
   // reset all variables that need to be reset to make game playable for next round
   gameState.buttonPressCount = 0;
-
-  // if user completed sequence completely, restart this function, else pull up some game over screen
-  // if the user has reached level 20, give confetti and pull up some winner screen
+  
+  // if user failed to repeat the entire sequence in the right order, show game over screen
   if (!roundWin) {
+    // if user got new highscore, update it
+    if (gameState.sequence.length - 1 > gameState.highscore) setNewHighscore(gameState.sequence.length - 1);
     showGameOverScreen();
     return;
   }
-
+  
+  // if the user has reached level 20, give confetti and pull up winner screen
   if (gameState.sequence.length === gameState.winLength) {
+    // if user got new highscore, update it
+    if (gameState.sequence.length > gameState.highscore) setNewHighscore(gameState.winLength);
     showWinScreen();
     return;
   }
-
+  
+  // if user completed sequence completely, restart this function
   main();
 };
+
+function setNewHighscore(score) {
+  console.log("Updated localStorage (highscore) to", score);
+  gameState.highscore = score;
+  localStorage.setItem("highscore", score);
+}
 
 function resetGame() {
   gameState.buttonPressCount = 0;
@@ -185,6 +205,9 @@ function showWinScreen() {
   
   // display end screen
   screen.end.element.message.innerText = "You Won!";
+  screen.end.element.messageDesc.innerText = `You lasted ${gameState.winLength} ${gameState.winLength === 1 ? "round" : "rounds"}.`;
+  screen.end.element.messageHighscore.style.display = "none"; // hide highscore because it looks bad
+  screen.end.element.button.innerText = "Go Again";
   screen.end.open();
 
   // reset all game variables
@@ -201,6 +224,9 @@ function showGameOverScreen() {
   // display end screen
   screen.end.element.message.innerText = "Game Over!";
   screen.end.element.messageDesc.innerText = `You lasted ${gameState.sequence.length - 1} ${gameState.sequence.length - 1 === 1 ? "round" : "rounds"}.`;
+  screen.end.element.messageHighscore.innerText = `Your highscore is ${gameState.highscore}`;
+  screen.end.element.messageHighscore.style.display = "unset";
+  screen.end.element.button.innerText = "Try Again";
   screen.end.open();
 
   // reset all game variables
@@ -283,4 +309,5 @@ function RNG() {
   return Math.ceil(Math.random() * 4);
 }
 
+loadGame(); // loads variables from game save
 startGame(); // run the main game
