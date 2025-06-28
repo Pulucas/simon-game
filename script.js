@@ -91,7 +91,7 @@ const gameState = {
   lengthBetweenHighlights: 300,
   sequence: [],
   buttonPressCount: 0,
-  winLength: 5,
+  winLength: 20,
   highscore: 0, // may change in loadGame()
   isMobile: !!('ontouchstart' in window || navigator.maxTouchPoints > 0), // checks if on mobile, turns result into boolean value
 }
